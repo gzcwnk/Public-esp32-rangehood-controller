@@ -1,0 +1,123 @@
+esphome:
+  name: rangehood-controller
+  friendly_name: rangehood-controller
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: "xxxxxxxxxxxx"
+
+ota:
+  password: !secret ota_password
+
+wifi:
+  ssid: !secret wifi_ssid
+  password: !secret wifi_password
+
+  manual_ip:
+    static_ip: 192.168.31.169
+    gateway: 192.168.31.1
+    subnet: 255.255.255.0
+
+  # Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "rangehood controller"
+    password: "xxxxxxx"
+
+captive_portal:
+
+web_server:
+
+binary_sensor:
+  - platform: gpio
+    pin: 
+      number: GPIO22
+      mode:
+         input: true
+         pullup: true
+         #inverted: true
+
+    name: "light relay"
+    id: relay1_button
+    on_press: 
+      - switch.toggle: relay1
+
+      
+  - platform: gpio
+    pin: 
+      number: GPIO23
+      mode:
+         input: true
+         pullup: true
+         #inverted: true
+
+    name: "slow speed relay"
+    id: relay2_button
+    on_press: 
+      - switch.toggle: relay2
+      
+  - platform: gpio
+    pin: 
+      number: GPIO26
+      mode:
+         input: true
+         pullup: true
+         #inverted: true
+
+    name: "medium speed relay"
+    id: relay3_button
+    on_press: 
+      - switch.toggle: relay3
+
+  - platform: gpio
+    pin: 
+      number: GPIO27
+      mode:
+         input: true
+         pullup: true
+         #inverted: true
+
+    name: "fast speed relay"
+    id: relay4_button
+    on_press: 
+      - switch.toggle: relay4
+
+
+
+
+switch:
+  
+  - platform: gpio
+    pin: GPIO21
+    name: "Lights #1"
+    id: relay1
+
+  - platform: gpio
+    pin: GPIO19
+    name: "slow speed relay #2"
+    id: relay2
+    #interlock: [relay3]
+    interlock_wait_time: 2000ms
+    interlock: [relay3, relay4]
+
+  - platform: gpio
+    pin: GPIO18
+    name: "mid speed Relay #3"
+    id: relay3
+    interlock: [relay2, relay4]
+    interlock_wait_time: 2000ms
+
+  - platform: gpio
+    pin: GPIO5
+    name: "fast fast Relay #4"
+    id: relay4
+    interlock: [relay2, relay3]
+    interlock_wait_time: 2000ms
